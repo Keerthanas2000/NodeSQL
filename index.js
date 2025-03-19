@@ -1,40 +1,43 @@
-// Get the MySQL client
-const mysql = require("mysql2");
-const express = require("express");
+// 
+const express= require('express');
+const mysql=require('mysql2');
 
-const app = express();
 
-// Middleware to parse JSON requests
-app.use(express.json());
+const app=express();
+let connection_str={
+  host:"localhost",
+  user:"root",
+  password:"Samsung@2000",
+  database:"world"
+}
+  query_str="select * from city limit 5";
 
-// Database connection settings
-const connection_str = {
-  host: "localhost",
-  user: "root",
-  password: "Samsung@2000",
-  database: "world",
-};
+const cr_connection=mysql.createConnection(connection_str);
 
-// Create a connection pool (better than single connection)
-const pool = mysql.createPool(connection_str);
 
-// Function to get cities
-const getCity = (req, res) => {
-  const query_string = "SELECT * FROM city LIMIT 10";
+const getcity=(req, res)=>
+{
+  cr_connection.execute(query_str, (err, results, fields)=> {
+    if (err) throw err
+      // console.log(fields);// contains extra meta data about results, if available
+      // console.log(results);  // results contains rows returned by server
+  res.send(results);
+    })
 
-  pool.query(query_string, (err, results) => {
-    if (err) {
-      console.error("Error executing query:", err.message);
-      return res.status(500).json({ error: "Database query failed" });
-    }
-    res.json(results);
-  });
-};
+}
 
-// Define route to get city data
-app.get("/getcity", getCity);
+app.get('/getcity', getcity) 
 
-// Start Express server
-app.listen(3001, () => {
-  console.log("Server is running on port 3001");
-});
+app.listen(3000)
+
+
+
+
+
+  //execute will internally call prepare and query
+  // prepare is used to prepare the query and query is used to execute the query
+
+
+  // prepare is a step where the SQL statement is parsed, validated, and optimized by the database before actual execution.
+
+ 
